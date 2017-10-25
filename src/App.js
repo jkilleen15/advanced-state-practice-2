@@ -4,17 +4,107 @@ import CarListing from "./components/CarListing";
 class App extends Component {
   constructor() {
     super();
-    this. state = {
-      currentYear:null,
-      currentMake:null,
+    this.state = {
+      currentYear: null,
+      currentMake: null,
     };
   }
   render() {
     const {carsForSale,vehicleData,allYears} = this.props.state;
 
+    /*
+    const carDivs = this.props.state.carsForSale.map(function(car) {
+      return <CarListing car={car} key={car.id} />;
+    });
+    */
+
+    const carDivs = this.props.state.carsForSale;
+    let carCollection = [];
+
+    // const filterDivs = () => {
+    if (this.state.currentMake === null || this.state.currentMake === "null") {
+        // for make seleceted - no and year selected - no
+      if (this.state.currentYear === null || this.state.currentYear === "null") {
+        carCollection = carDivs;
+      }
+        // for make selected - no and year seleceted - yes
+      else if (this.state.currentYear !== null && this.state.currentYear !== "null") {
+        let filteredDivs = carDivs.filter((car) => {
+          console.log("car year" + car.year);
+          console.log("state year" + this.state.currentYear);
+          return car.year.toString() === this.state.currentYear.toString();
+        });
+        carCollection = filteredDivs;
+      }
+    }
+    // for make selected - yes
+    else if (this.state.currentMake !== null || this.state.currentMake !== "null") {
+      // for make selected - yes and year selected - no
+      if (this.state.currentYear === null || this.state.currentYear === "null") {
+        let filteredDivs = carDivs.filter((car) => {
+          console.log("car make" + car.make);
+          console.log("car year" + car.year);
+          console.log("state make" + this.state.currentMake);
+          console.log("state year" + this.state.currentYear);
+          return car.make.toString() === this.state.currentMake.toString();
+        });
+        carCollection = filteredDivs;
+      }
+      else {
+        // for make selected - yes and year selected - yes
+        let filteredDivs = carDivs.filter((car) => {
+          console.log("car make" + car.make);
+          console.log("car year" + car.year);
+          console.log("state" + this.state.currentMake);
+          console.log("state year" + this.state.currentYear);
+          return (car.make.toString() === this.state.currentMake.toString() &&
+                   car.year.toString() === this.state.currentYear.toString());
+        });
+        carCollection = filteredDivs;
+      }
+    }
+
+    const carsToDisplay = carCollection.map(function (car) {
+      return <CarListing car={car} key={car.id} />;
+    });
+
+    const yearDivs = this.props.state.allYears.map((year, i) => {
+      return <option value={allYears[i]} key={allYears[i]}>{allYears[i]}</option>
+    });
+
+    const brandDivs = this.props.state.vehicleData.map((model) => {
+      return <option value={model.value} key={model.value}>{model.title}</option>
+    });
+
+    const handleYearChange = (e) => {
+      this.setState({
+        currentYear: e.target.value
+      });
+      console.log(this.state.currentYear);
+    };
+
+    const handleBrandChange = (e) => {
+      this.setState({
+        currentMake: e.target.value
+      });
+      console.log(this.state.currentMake);
+    };
+
+    /*
+    const filteredDivs = props.state.products.filter((product) => {
+  return product.category === props.currentCategory;
+});
+    */
+
+    /*
+    // In the render method, filter the carsForSale array on the
+       currentYear and currentMake state properties
+    // If currentYear and currentMake are null or blank then don't filter
+    */
+
     return (
       <div >
-<div className="switcher-wrapper">	
+<div className="switcher-wrapper">
     <div className="demo_changer">
         <div className="demo-icon customBgColor"><i className="fa fa-cog fa-spin fa-2x"></i></div>
         <div className="form_holder">
@@ -163,7 +253,9 @@ class App extends Component {
           </div>
         </div>
         <div className="row">
-        <CarListing />
+
+          {carsToDisplay}
+
         </div>
         <div className="pagination">
           <ul>
@@ -175,7 +267,7 @@ class App extends Component {
           </ul>
         </div>
       </div>
-    
+
       <aside className="col-md-3 col-md-pull-9">
         <div className="sidebar_widget">
           <div className="widget_heading">
@@ -184,16 +276,10 @@ class App extends Component {
           <div className="sidebar_filter">
             <form action="http://themes.webmasterdriver.net/carforyou/demo/listing-grid.html#" method="get">
               <div className="form-group select">
-                <select className="form-control">
-                  <option>Select Year</option>
-                  <option>2017</option>
-                  <option>2016</option>
-                  <option>2015</option>
-                  <option>2014</option>
-                  <option>2013</option>
-                  <option>2012</option>
-                  <option>2011</option>
-                  <option>2010</option>
+                <select onChange={handleYearChange} className="form-control">
+                  <option value="null">Select Year</option>
+                  {yearDivs}
+
                 </select>
               </div>
               <div className="form-group select">
@@ -210,16 +296,9 @@ class App extends Component {
                 </select>
               </div>
               <div className="form-group select">
-                <select className="form-control">
-                  <option>Select Brand</option>
-                  <option>Audi</option>
-                  <option>BMW</option>
-                  <option>Nissan</option>
-                  <option>Toyota</option>
-                  <option>Volvo</option>
-                  <option>Mazda</option>
-                  <option>Mercedes-Benz</option>
-                  <option>Lotus</option>
+                <select onChange={handleBrandChange} className="form-control">
+                  <option value="null">Select Brand</option>
+                  {brandDivs}
                 </select>
               </div>
               <div className="form-group select">
@@ -257,8 +336,8 @@ class App extends Component {
                     <div className="tooltip-arrow"></div><div className="tooltip-inner">1000</div></div>
                     <div className="tooltip tooltip-max top" role="presentation" style={{left: "83.1933%",marginLeft: "-21.5px"}}>
                       <div className="tooltip-arrow"></div><div className="tooltip-inner">5000</div></div>
-                      <div className="slider-handle min-slider-handle round" role="slider" aria-valuemin="50" aria-valuemax="6000" aria-valuenow="1000" tabindex="0" style={{left: "15.9664%"}}></div>
-                      <div className="slider-handle max-slider-handle round" role="slider" aria-valuemin="50" aria-valuemax="6000" aria-valuenow="5000" tabindex="0" style={{left: "83.1933%"}}></div>
+                      <div className="slider-handle min-slider-handle round" role="slider" aria-valuemin="50" aria-valuemax="6000" aria-valuenow="1000" tabIndex="0" style={{left: "15.9664%"}}></div>
+                      <div className="slider-handle max-slider-handle round" role="slider" aria-valuemin="50" aria-valuemax="6000" aria-valuenow="5000" tabIndex="0" style={{left: "83.1933%"}}></div>
                       </div>
                       <input id="price_range" type="text" className="span2" value="1000,5000" data-slider-min="50" data-slider-max="6000" data-slider-step="5" data-slider-value="[1000,5000]" data-value="1000,5000" style={{display: "none"}} />
               </div>
@@ -338,10 +417,10 @@ class App extends Component {
               <img src="./brand-logo-4.png" className="img-responsive" alt="image" /></a></div></div><div className="owl-item" style={{width: "204px"}}>
                 <div><a href="http://themes.webmasterdriver.net/carforyou/demo/listing-grid.html#"><img src="./brand-logo-5.png" className="img-responsive" alt="image" /></a></div>
                 </div></div></div>
-        
-        
-        
-        
+
+
+
+
       <div className="owl-controls clickable" style={{display: "block"}}><div className="owl-pagination"><div className="owl-page"><span className=""></span></div><div className="owl-page active"><span className=""></span></div></div></div></div>
     </div>
   </div>
@@ -448,7 +527,7 @@ class App extends Component {
                 </div>
                 <div className="form-group checkbox">
                   <input type="checkbox" id="remember" />
-                  <label for="remember">Remember Me</label>
+                  <label htmlFor="remember">Remember Me</label>
                 </div>
                 <div className="form-group">
                   <input type="submit" value="Login" className="btn btn-block" />
@@ -496,7 +575,7 @@ class App extends Component {
                 </div>
                 <div className="form-group checkbox">
                   <input type="checkbox" id="terms_agree" />
-                  <label for="terms_agree">I Agree with <a href="http://themes.webmasterdriver.net/carforyou/demo/listing-grid.html#">Terms and Conditions</a></label>
+                  <label htmlFor="terms_agree">I Agree with <a href="http://themes.webmasterdriver.net/carforyou/demo/listing-grid.html#">Terms and Conditions</a></label>
                 </div>
                 <div className="form-group">
                   <input type="submit" value="Sign Up" className="btn btn-block" />
